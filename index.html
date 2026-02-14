@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Radha Counter App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #ff758c, #ff7eb3);
+      font-family: Arial, sans-serif;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      padding: 40px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      width: 320px;
+      color: white;
+    }
+
+    .count {
+      font-size: 50px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .start-btn {
+      background: white;
+      color: #ff4f81;
+    }
+
+    .reset-btn {
+      background: #ff4f81;
+      color: white;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <h2>🎤 Radha Radha Word Counter</h2>
+    
+    <div class="count" id="count">0</div>
+
+    <button class="start-btn" onclick="startListening()">Start</button>
+    <button class="reset-btn" onclick="resetCount()">Reset</button>
+
+    <div class="status" id="status">Not Listening</div>
+  </div>
+
+  <script>
+    let count = 0;
+    let lastTranscript = "";
+
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = true;
+    recognition.interimResults = true;  // 🔥 Important
+    recognition.lang = "en-IN";
+
+    recognition.onresult = function(event) {
+      let transcript = "";
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript.toLowerCase();
+      }
+
+      // Remove already processed text
+      let newText = transcript.replace(lastTranscript, "");
+      lastTranscript = transcript;
+
+      let matches = newText.match(/radha/g);
+      if (matches) {
+        count += matches.length;
+        document.getElementById("count").innerText = count;
+      }
+    };
+
+    function startListening() {
+      recognition.start();
+      document.getElementById("status").innerText = "Listening...";
+    }
+
+    function resetCount() {
+      count = 0;
+      lastTranscript = "";
+      document.getElementById("count").innerText = count;
+    }
+
+    recognition.onend = function() {
+      recognition.start(); // auto restart
+    };
+  </script>
+
+</body>
+</html>
